@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Giphy API</title>
+		<link type='text/css' rel='stylesheet' href='assets/css/style.css'/>
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open Sans"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	</head>
+ <body>
+     
+     <h1>GIPHY API</h1>
+	<div id="button_area"></div>
+
+	  <form id="car-form">
+	    <label for="car-input" class="inputClass">Add</label>
+	    <input type="text" id="car-input" class="inputClass">
+	    <input id="add" type="submit" value="Submit" class="inputClass">
+	  </form>
+    <br>
+    <hr>
+	<div id="superCars"></div>
+     
+     
+<!--  ================================================================================  -->   
+     
+<script>
+$(document).ready(function(){
+    
+
+//array 
+var superCar = ["Bugatti", "Lamborghini", "McLaren", "Ferrari", "Aston Martin"];
+
+
+
+//create button
+function makeButton(){
+    $("#button_area").empty();
+    for (var i = 0; i < superCar.length; i++){
+        var btn = $("<button>");
+        btn.addClass("car-button");
+        btn.attr("data-type", superCar[i]);
+        btn.text(superCar[i]);
+        $("#button_area").append(btn);
+    }
+   
+    
+//add api to button
+$("button").on("click", function(){ 
+        $("#superCars").empty();
+    var name = $(this).attr("data-type");
+    var queryURL= "http://api.giphy.com/v1/gifs/search?q=" + name + "&api_key=dc6zaTOxFJmzC&limit=10";
+    
+$.ajax({
+      url: queryURL,
+      method: "GET"
+}).done(function(response){
+    var results = response.data;
+    
+    for (var i = 0; i < results.length; i++){
+        var newDiv = $("<div class='carz'>");
+        var animated = results[i].images.fixed_height.url;
+        var still = results[i].images.fixed_height_still.url;
+        
+        var showImg = $("<img>");
+        showImg.attr("src", still);
+        showImg.attr("data-still", still);
+        showImg.attr("data-ani", animated);
+        showImg.attr("data-start", "still");
+        showImg.addClass("carImgClass");
+        newDiv.prepend(showImg);
+        
+        $("#superCars").prepend(newDiv);
+  
+        }
+    })
+});   
+}
+    
+    
+//function if and else for image switch still and animated
+$(document).on("click", ".carImgClass", function(){
+    var start = $(this).attr("data-start");
+
+    if(start === "still"){
+     $(this).attr("src", $(this).attr("data-ani"));
+     $(this).attr("data-start", "ani");
+    } else {
+     $(this).attr("src", $(this).attr("data-still"));
+     $(this).attr("data-start", "still");
+    }
+});   
+
+//function: add button from input search 
+$("#add").on("click", function(event) {
+    event.preventDefault();
+    var newCar = $("#car-input").val();
+    superCar.push(newCar);
+     makeButton();   
+}); 
+makeButton();     
+//call all function.
+});//document.ready
+</script>
+
+    </body>
+</html>
